@@ -1,3 +1,9 @@
+// Checkbox 변수 저장
+var items = {item1: false, item2: false, item3: false, item4: false};
+chrome.storage.local.set(items, function(){
+	console.log("save complete!");
+});
+
 // Content_script로부터 메시지를 받을 시 서버와 통신
 chrome.runtime.onMessage.addListener(
   function(request, sender, sendResponse) {

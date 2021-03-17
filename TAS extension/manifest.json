@@ -30,9 +30,9 @@
         "content_script.js"
       ],
       "matches": [
-        "https://gall.dcinside.com/board/view/*"
+        "<all_urls>"
       ],
-      "run_at": "document_end"
+      "run_at": "document_idle"
     }
   ]
 }

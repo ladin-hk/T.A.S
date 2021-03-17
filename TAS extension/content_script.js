@@ -1,57 +1,49 @@
-// Background로 데이터 전송 및 반환을 위해 Message 전달
-chrome.runtime.sendMessage( 
-      {contentScriptQuery: "Filtering", endpoint:"use_model", dataToSend:(() => {
-
-        // 서버로 전송을 위한 HTML Crawling
-        let data = { text: [] }; 
-        let elements_1 = Array.from(document.getElementsByClassName('usertxt ub-word')); // 댓글 
-        let elements_2 = Array.from(document.getElementsByClassName('title_subject')); // 제목
-        let elements_3 = Array.from(document.getElementsByClassName('gall_tit ub-word')); // 목록
-        let view_box = Array.from(document.getElementsByClassName('writing_view_box')); // 내용
-        let elements_4 = [];
-        for (let element of view_box) {
-          let view_box_texts = element.innerText;
-          elements_4 = view_box_texts.split('\n');
-        }
-        for (let element of elements_1) {
-          data.text.push(element.innerText);
-        }
-        for (let element of elements_2) {
-          data.text.push(element.innerText);
-        }
-        for (let element of elements_3) {
-          data.text.push(element.innerText);
-        }
-        for (let element of elements_4) {
-          data.text.push(element);
-        }   
-        return data;
-
-      })()},
-      json => {
-
-        // 필터링 적용을 위한 HTML Crawling
-        let elements_1 = Array.from(document.getElementsByClassName('usertxt ub-word'));
-        let elements_2 = Array.from(document.getElementsByClassName('title_subject'));
-        let elements_3 = Array.from(document.getElementsByClassName('gall_tit ub-word'));
-        let view_box = Array.from(document.getElementsByClassName('writing_view_box'));
-        let elements_4 = [];
-        for (let element of view_box) {
-          let view_box_texts = element.innerText;
-          elements_4 = view_box_texts.split('\n');
-        }
-        let elements = elements_1.concat(elements_2.concat(elements_3.concat(elements_4)));
-
-        // 서버로부터 욕설 가능성 반환 후 필터링
-        let probability = json.prob;
-        for (let i = 0; i < probability.length - elements_4.length; i++) {
-          if (Number(probability[i]) > 0.5) {
-            elements[i].innerText = "<필터링 된 문장입니다. 사유 : 욕설>";
-          }
-        }
-        for (let i = probability.length - elements_4.length; i < probability.length; i++) {
-          if (Number(probability[i]) > 0.5) {
-            document.getElementsByClassName("writing_view_box").item(0).innerHTML = document.getElementsByClassName("writing_view_box").item(0).innerHTML.replace(elements[i], "<필터링 된 문장입니다. 사유 : 욕설>");
-          }
-        }
-      })
+var keys = ["item1", "item2", "item3", "item4"];
+var check1;
+var check2;
+var check3;
+var check4;
+chrome.storage.local.get(keys, function(items){
+	check1 = items.item1;
+	check2 = items.item2;
+	check3 = items.item3;
+	check4 = items.item4;
+	var elements = document.getElementsByTagName("*");
+	var filtering_elements = [];
+	for(var i = 0; i < elements.length; i++){
+		var div = elements.item(i);
+		try{
+			for(let node of div.childNodes){
+				if(node.nodeValue != null && node.nodeValue != ' '){
+					filtering_elements.push(node);
+				}
+			}
+		}
+		catch{
+		}
+	}
+	// Background로 데이터 전송 및 반환을 위해 Message 전달
+	chrome.runtime.sendMessage(
+		{contentScriptQuery: "Filtering", endpoint:"use_model", dataToSend:(() => {
+			// 서버로 전송을 위한 HTML Crawling
+			let data = { text: [], check: [] }; 
+			data.check.push(check1);
+			data.check.push(check2);
+			data.check.push(check3);
+			data.check.push(check4);
+			for(var i = 0; i < filtering_elements.length; i++){
+				data.text.push(filtering_elements[i].nodeValue);
+			}
+			return data;
+	})()},
+	json => {
+		// 필터링 적용을 위한 HTML Crawling
+		var elements = document.getElementsByTagName("*");
+		let probability = json.prob;
+		for(var i = 0; i < filtering_elements.length; i++){
+			if(probability[i] > 0.5){
+				filtering_elements[i].nodeValue = '<필터링 된 문장입니다.>';
+			}
+		}
+	})
+});
