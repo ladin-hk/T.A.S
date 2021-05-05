@@ -1,13 +1,11 @@
-var keys = ["item1", "item2", "item3", "item4"];
+var keys = ["item1", "item2", "item3"];
 var check1;
 var check2;
 var check3;
-var check4;
 chrome.storage.local.get(keys, function(items){
 	check1 = items.item1;
 	check2 = items.item2;
 	check3 = items.item3;
-	check4 = items.item4;
 	var elements = document.getElementsByTagName("*");
 	var filtering_elements = [];
 	for(var i = 0; i < elements.length; i++){
@@ -30,7 +28,6 @@ chrome.storage.local.get(keys, function(items){
 			data.check.push(check1);
 			data.check.push(check2);
 			data.check.push(check3);
-			data.check.push(check4);
 			for(var i = 0; i < filtering_elements.length; i++){
 				data.text.push(filtering_elements[i].nodeValue);
 			}
@@ -41,7 +38,7 @@ chrome.storage.local.get(keys, function(items){
 		var elements = document.getElementsByTagName("*");
 		let probability = json.prob;
 		for(var i = 0; i < filtering_elements.length; i++){
-			if(probability[i] > 0.5){
+			if(probability[i] >= 50){
 				filtering_elements[i].nodeValue = '<필터링 된 문장입니다.>';
 			}
 		}

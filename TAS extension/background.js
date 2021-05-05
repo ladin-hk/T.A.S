@@ -1,5 +1,5 @@
 // Checkbox 변수 저장
-var items = {item1: false, item2: false, item3: false, item4: false};
+var items = {item1: false, item2: false, item3: false};
 chrome.storage.local.set(items, function(){
 	console.log("save complete!");
 });
